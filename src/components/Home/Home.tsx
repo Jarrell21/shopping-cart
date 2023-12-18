@@ -1,5 +1,4 @@
-import { Counter } from "../Counter/Counter"
-import Categories from "./Categories/Categories"
+import Categories from "./Categories"
 import TopProducts from "./TopProducts"
 
 const Home = () => {

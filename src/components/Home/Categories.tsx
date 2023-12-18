@@ -1,8 +1,8 @@
 import { Col, Container, Row, Spinner, Stack } from "react-bootstrap"
 import { FaTv } from "react-icons/fa6"
 import { Link } from "react-router-dom"
-import style from "./Categories.module.scss"
-import { useGetCategoriesQuery } from "../../../redux/api/apiSlice"
+import { useGetCategoriesQuery } from "../../redux/api/apiSlice"
+import styled from "styled-components"
 
 function Categories() {
   const { data, error, isLoading } = useGetCategoriesQuery(arguments)
@@ -12,32 +12,34 @@ function Categories() {
 
   if (error) {
     content = (
-      <div className="text-center">A network error has encountered.</div>
+      <ColStyle className="border p-0">
+        <Stack className="flexbox">
+          Failed to load categories. A network error has occured.
+        </Stack>
+      </ColStyle>
     )
   } else if (isLoading) {
     content = placeholderCategories.map((_, index) => (
-      <Col className={`${style.category} border p-0`} key={index}>
-        <Stack className={style.flexbox}>
+      <ColStyle className="border p-0" key={index}>
+        <Stack className="flexbox">
           <Spinner animation="border" />
         </Stack>
-      </Col>
+      </ColStyle>
     ))
   } else {
     content = data?.map((category: string, index: number) => {
-      let cleanCategoryName = category.replace(/\s+/g, "-").replace(/'/g, "")
-
       return (
-        <Col className={`${style.category} border p-0`} key={index}>
+        <ColStyle md className="border p-0" key={index}>
           <Link
-            to={`products/category/${cleanCategoryName}`}
+            to={`products/category/${category}`}
             className="text-decoration-none text-reset"
           >
-            <Stack className={style.flexbox}>
+            <Stack className="flexbox">
               <FaTv size="50%" />
               <span>{category.toUpperCase()}</span>
             </Stack>
           </Link>
-        </Col>
+        </ColStyle>
       )
     })
   }
@@ -53,3 +55,13 @@ function Categories() {
 }
 
 export default Categories
+
+const ColStyle = styled(Col)`
+  height: 200px;
+
+  .flexbox {
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+`
