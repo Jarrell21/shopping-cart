@@ -10,3 +10,17 @@ export type Product = {
     count: number
   }
 }
+
+export type CartProduct = {
+  productId: number
+  quantity: number
+  selected: boolean
+}
+
+export type CartData = {
+  id: number
+  userId: number
+  date: string
+  products: CartProduct[]
+  __v: number
+}

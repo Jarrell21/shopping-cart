@@ -1,20 +1,33 @@
 import { Col, Container, Row, Spinner, Stack } from "react-bootstrap"
-import { FaTv } from "react-icons/fa6"
+import { FaTv, FaRegGem } from "react-icons/fa6"
+import { GiClothes } from "react-icons/gi"
 import { Link } from "react-router-dom"
 import { useGetCategoriesQuery } from "../../redux/api/apiSlice"
 import styled from "styled-components"
 
+type CategoryIconProps = {
+  category: string
+  size: string
+}
+
 function Categories() {
-  const { data, error, isLoading } = useGetCategoriesQuery(arguments)
+  const {
+    data: categoryData = [],
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useGetCategoriesQuery()
 
-  let content
   const placeholderCategories = new Array(4).fill("")
+  let content
 
-  if (error) {
+  if (isError) {
     content = (
       <ColStyle className="border p-0">
         <Stack className="flexbox">
           Failed to load categories. A network error has occured.
+          {error.toString()}
         </Stack>
       </ColStyle>
     )
@@ -26,17 +39,18 @@ function Categories() {
         </Stack>
       </ColStyle>
     ))
-  } else {
-    content = data?.map((category: string, index: number) => {
+  } else if (isSuccess) {
+    content = categoryData?.map((category: string, index: number) => {
+      let categoryUpper = category.toUpperCase()
       return (
         <ColStyle md className="border p-0" key={index}>
           <Link
-            to={`products/category/${category}`}
+            to={`/products/category/${category}`}
             className="text-decoration-none text-reset"
           >
             <Stack className="flexbox">
-              <FaTv size="50%" />
-              <span>{category.toUpperCase()}</span>
+              <CategoryIcon category={categoryUpper} size="50%" />
+              <span>{categoryUpper}</span>
             </Stack>
           </Link>
         </ColStyle>
@@ -52,6 +66,20 @@ function Categories() {
       </Container>
     </>
   )
+}
+
+function CategoryIcon({ category, size }: CategoryIconProps) {
+  let icon
+  if (category === "ELECTRONICS") {
+    icon = <FaTv size={size} />
+  } else if (category === "JEWELERY") {
+    icon = <FaRegGem size={size} />
+  } else if (category === "MEN'S CLOTHING") {
+    icon = <GiClothes size={size} />
+  } else if (category === "WOMEN'S CLOTHING") {
+    icon = <GiClothes size={size} />
+  }
+  return <>{icon}</>
 }
 
 export default Categories

@@ -3,10 +3,10 @@ import TopProducts from "./TopProducts"
 
 const Home = () => {
   return (
-    <main>
+    <>
       <Categories />
       <TopProducts />
-    </main>
+    </>
   )
 }
 

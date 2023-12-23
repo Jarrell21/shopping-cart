@@ -7,10 +7,12 @@ import GlobalStyle from "./styles/GlobalStyle"
 
 function App() {
   return (
-    <Stack style={{ minHeight: "100vh" }}>
+    <Stack className="min-vh-100 vh-100">
       <GlobalStyle />
       <Header />
-      <Outlet />
+      <main style={{ flex: 1 }}>
+        <Outlet />
+      </main>
       <Footer />
     </Stack>
   )

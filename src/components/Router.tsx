@@ -1,10 +1,10 @@
-import App from "../../App"
-import ErrorPage from "./ErrorPage"
+import App from "../App"
+import ErrorPage from "./Common/ErrorPage"
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
-import Products from "../Products"
-import Home from "../Home/Home"
-import Category from "../Category"
-import Product from "../Product"
+import Products from "./Products"
+import Home from "./Home/Home"
+import Product from "./Product"
+import Cart from "./Cart"
 
 function Router() {
   const router = createBrowserRouter([
@@ -14,12 +14,16 @@ function Router() {
       children: [
         { path: "/", element: <Home /> },
         {
+          path: "cart",
+          element: <Cart />,
+        },
+        {
           path: "products",
           element: <Products />,
         },
         {
           path: "products/category/:categoryName",
-          element: <Category />,
+          element: <Products />,
         },
         {
           path: "products/:productId",
@@ -27,6 +31,10 @@ function Router() {
         },
       ],
       errorElement: <ErrorPage />,
+    },
+    {
+      path: "error",
+      element: <ErrorPage />,
     },
   ])
   return <RouterProvider router={router} />
