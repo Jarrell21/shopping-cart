@@ -3,7 +3,7 @@ import ErrorPage from "./Common/ErrorPage"
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 import Products from "./Products"
 import Home from "./Home/Home"
-import Product from "./Product"
+import Product from "./Product/Product"
 import Cart from "./Cart"
 
 function Router() {

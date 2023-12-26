@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import { CartData, Product } from "../types"
+import { Product } from "../types"
 
 export const apiSlice = createApi({
   reducerPath: "api",
@@ -8,15 +8,10 @@ export const apiSlice = createApi({
     getCategories: builder.query<string[], void>({
       query: () => "/products/categories",
     }),
-    getProducts: builder.query<
-      Product[],
-      { limit?: number; category?: string }
-    >({
-      query: ({ limit, category }) => {
+    getProducts: builder.query<Product[], { category?: string }>({
+      query: ({ category }) => {
         if (category) {
           return `/products/category/${category}`
-        } else if (limit) {
-          return `/products?limit=${limit}`
         } else {
           return "/products"
         }

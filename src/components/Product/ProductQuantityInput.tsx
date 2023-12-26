@@ -1,8 +1,8 @@
 import React from "react"
 import { Button, Form, InputGroup } from "react-bootstrap"
 import styled from "styled-components"
-import { useAppDispatch } from "../redux/hooks"
-import { updateProduct } from "../redux/cart/cartSlice"
+import { useAppDispatch } from "../../redux/hooks"
+import { updateProduct } from "../../redux/cart/cartSlice"
 
 type ProductQuantityProps = {
   className?: string
@@ -29,6 +29,16 @@ function ProductQuantityInput({
 
     if (inputValue < 1) {
       inputValue = 1
+    }
+
+    if (productId) {
+      dispatch(
+        updateProduct({
+          productId: productId,
+          quantity: inputValue,
+        }),
+      )
+      return
     }
 
     setQuantityValue!(inputValue)

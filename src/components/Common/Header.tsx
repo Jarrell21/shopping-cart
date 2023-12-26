@@ -1,5 +1,5 @@
-import { Badge, Container, Nav, Navbar, Stack } from "react-bootstrap"
-import { FaCartShopping, FaMagnifyingGlass } from "react-icons/fa6"
+import { Badge, Container, Nav, Navbar } from "react-bootstrap"
+import { FaCartShopping } from "react-icons/fa6"
 import { IoPersonCircleSharp } from "react-icons/io5"
 import { Link } from "react-router-dom"
 import styled from "styled-components"

@@ -56,6 +56,10 @@ export const cartSlice = createSlice({
         } else if (verb === "DECREMENT") {
           existingProduct.quantity -= 1
         }
+
+        if (quantity) {
+          existingProduct.quantity = quantity!
+        }
       }
     },
     deleteProductById: (state, action: PayloadAction<number>) => {

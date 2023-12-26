@@ -2,7 +2,6 @@ import { useEffect } from "react"
 import { useGetProductsQuery } from "../redux/api/apiSlice"
 import { Card, Col, Container, Row, Spinner, Stack } from "react-bootstrap"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import styled from "styled-components"
 
 function Products() {
   const { categoryName } = useParams()
@@ -12,7 +11,6 @@ function Products() {
     isLoading,
     isSuccess,
     isError,
-    error,
   } = useGetProductsQuery({ category: categoryName })
 
   useEffect(() => {
@@ -27,20 +25,23 @@ function Products() {
     content = (
       <Stack className="justify-content-center align-items-center h-100">
         Failed to load products. A network error has occured.
-        {error.toString()}
       </Stack>
     )
   } else if (isLoading) {
     content = (
-      <Stack className=" justify-content-center align-items-center h-100">
+      <Stack className="justify-content-center align-items-center h-100">
         <Spinner animation="border" />
       </Stack>
     )
   } else if (isSuccess) {
     content = (
-      <StyledRow s={1} md={2} lg={3} xl={4} className="g-4">
+      <Row s={1} md={2} lg={3} xl={4} className="g-4">
         {products?.map((product, index) => (
-          <Link to={`/products/${product.id}`} key={index}>
+          <Link
+            className="text-decoration-none"
+            to={`/products/${product.id}`}
+            key={index}
+          >
             <Col>
               <Card className="p-4">
                 <Card.Img
@@ -49,20 +50,20 @@ function Products() {
                   className="w-50 h-auto"
                 />
                 <Card.Body>
-                  <Card.Title>{product.title.substring(0, 46)}...</Card.Title>
-                  <Card.Text>
+                  <Card.Title>{product.title.substring(0, 20)}...</Card.Title>
+                  <div>
                     <p>${product.price}</p>
                     <Stack direction="horizontal" className="gap-3">
                       <p>{product.rating.rate} Stars</p>
                       <p>{product.rating.count}+ Sold</p>
                     </Stack>
-                  </Card.Text>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
           </Link>
         ))}
-      </StyledRow>
+      </Row>
     )
   }
 
@@ -70,9 +71,3 @@ function Products() {
 }
 
 export default Products
-
-const StyledRow = styled(Row)`
-  a {
-    text-decoration: none;
-  }
-`

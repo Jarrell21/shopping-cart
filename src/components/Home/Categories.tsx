@@ -16,7 +16,6 @@ function Categories() {
     isLoading,
     isSuccess,
     isError,
-    error,
   } = useGetCategoriesQuery()
 
   const placeholderCategories = new Array(4).fill("")
@@ -24,26 +23,25 @@ function Categories() {
 
   if (isError) {
     content = (
-      <ColStyle className="border p-0">
+      <StyledCol className="border p-0">
         <Stack className="flexbox">
           Failed to load categories. A network error has occured.
-          {error.toString()}
         </Stack>
-      </ColStyle>
+      </StyledCol>
     )
   } else if (isLoading) {
     content = placeholderCategories.map((_, index) => (
-      <ColStyle className="border p-0" key={index}>
+      <StyledCol className="border p-0" key={index}>
         <Stack className="flexbox">
           <Spinner animation="border" />
         </Stack>
-      </ColStyle>
+      </StyledCol>
     ))
   } else if (isSuccess) {
     content = categoryData?.map((category: string, index: number) => {
       let categoryUpper = category.toUpperCase()
       return (
-        <ColStyle md className="border p-0" key={index}>
+        <StyledCol md className="border p-0" key={index}>
           <Link
             to={`/products/category/${category}`}
             className="text-decoration-none text-reset"
@@ -53,7 +51,7 @@ function Categories() {
               <span>{categoryUpper}</span>
             </Stack>
           </Link>
-        </ColStyle>
+        </StyledCol>
       )
     })
   }
@@ -84,7 +82,7 @@ function CategoryIcon({ category, size }: CategoryIconProps) {
 
 export default Categories
 
-const ColStyle = styled(Col)`
+const StyledCol = styled(Col)`
   height: 200px;
 
   .flexbox {

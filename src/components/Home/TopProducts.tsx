@@ -9,8 +9,7 @@ function TopProducts() {
     isLoading,
     isSuccess,
     isError,
-    error,
-  } = useGetProductsQuery({ limit: 5 })
+  } = useGetProductsQuery({})
   const [index, setIndex] = useState(0)
 
   const handleSelect = (selectedIndex: number) => {
@@ -21,10 +20,12 @@ function TopProducts() {
 
   if (isError) {
     content = (
-      <div>
-        Failed to load categories. A network error has occured.
-        {error.toString()}
-      </div>
+      <Carousel.Item
+        style={{ height: "40vh" }}
+        className="d-flex justify-content-center align-items-center"
+      >
+        Failed to load products. A network error has occured.
+      </Carousel.Item>
     )
   } else if (isLoading) {
     content = (
@@ -36,27 +37,33 @@ function TopProducts() {
       </Carousel.Item>
     )
   } else if (isSuccess) {
-    content = productsData?.map((product) => (
-      <Carousel.Item style={{ height: "350px" }} key={product.id}>
-        <Figure className="d-flex justify-content-center">
-          <Figure.Image
-            width={171}
-            height={180}
-            alt="171x180"
-            src={product.image}
-          />
-        </Figure>
-        <Carousel.Caption
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", color: "white" }}
-        >
-          <h3>{product.title}</h3>
-          <p>
-            {product.description.substring(0, 50)}...{" "}
-            <Link to={`/products/${product.id}`}>See more</Link>
-          </p>
-        </Carousel.Caption>
-      </Carousel.Item>
-    ))
+    content = productsData?.map((product, index) => {
+      if (index % 5 === 0) {
+        return (
+          <Carousel.Item style={{ height: "350px" }} key={product.id}>
+            <Figure className="d-flex justify-content-center">
+              <Figure.Image
+                width={171}
+                height={180}
+                alt="171x180"
+                src={product.image}
+              />
+            </Figure>
+            <Carousel.Caption
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", color: "white" }}
+            >
+              <h3>{product.title}</h3>
+              <p>
+                {product.description.substring(0, 50)}...{" "}
+                <Link to={`/products/${product.id}`}>See more</Link>
+              </p>
+            </Carousel.Caption>
+          </Carousel.Item>
+        )
+      }
+
+      return null
+    })
   }
 
   return (
