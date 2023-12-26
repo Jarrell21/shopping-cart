@@ -31,7 +31,7 @@ function Categories() {
     )
   } else if (isLoading) {
     content = placeholderCategories.map((_, index) => (
-      <StyledCol className="border p-0" key={index}>
+      <StyledCol md className="border p-0" key={index}>
         <Stack className="flexbox">
           <Spinner animation="border" />
         </Stack>
@@ -41,7 +41,7 @@ function Categories() {
     content = categoryData?.map((category: string, index: number) => {
       let categoryUpper = category.toUpperCase()
       return (
-        <StyledCol md className="border p-0" key={index}>
+        <StyledCol md className="p-0 shadow-sm" key={index}>
           <Link
             to={`/products/category/${category}`}
             className="text-decoration-none text-reset"
@@ -58,8 +58,8 @@ function Categories() {
 
   return (
     <>
-      <Container className="border py-2">
-        <h3>Categories</h3>
+      <Container className="bg-white rounded-top shadow my-4">
+        <h3 className="p-3 mb-0">Categories</h3>
         <Row>{content}</Row>
       </Container>
     </>
@@ -89,5 +89,12 @@ const StyledCol = styled(Col)`
     align-items: center;
     justify-content: center;
     height: 100%;
+  }
+
+  &:hover {
+    background-color: rgba(
+      var(--bs-secondary-bg-rgb),
+      var(--bs-bg-opacity)
+    ) !important;
   }
 `

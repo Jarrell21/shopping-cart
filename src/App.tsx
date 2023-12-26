@@ -9,7 +9,7 @@ function App() {
     <Stack className="min-vh-100 vh-100">
       <GlobalStyle />
       <Header />
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1 }} className="bg-body-tertiary">
         <Outlet />
       </main>
     </Stack>

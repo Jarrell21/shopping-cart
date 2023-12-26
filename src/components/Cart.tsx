@@ -155,15 +155,14 @@ function Cart() {
           <Table
             responsive
             hover
-            bordered
-            className="text-center"
+            className="text-center shadow"
             style={{
               minWidth: "600px",
             }}
           >
             <thead>
               <tr>
-                <th className="align-middle">
+                <th className="align-middle p-3">
                   <Form.Check
                     aria-label="option 1"
                     checked={isSelectAll}
@@ -177,7 +176,7 @@ function Cart() {
                 <th className="align-middle">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="table-group-divider">
               {cartProducts?.map((product, index) => (
                 <tr key={index}>
                   <td className="align-middle">
@@ -190,10 +189,13 @@ function Cart() {
                     />
                   </td>
                   <td>
-                    <Link to={`/products/${product?.id}`}>
+                    <Link
+                      className="text-decoration-none text-reset"
+                      to={`/products/${product?.id}`}
+                    >
                       <Stack className="flex-row gap-2 align-items-center">
-                        <img src={product?.image} alt="" width={50} />
-                        <p>{product?.title}</p>
+                        <img src={product?.image} alt="" width={100} />
+                        <span className="fw-bold ">{product?.title}</span>
                       </Stack>
                     </Link>
                   </td>
@@ -220,7 +222,7 @@ function Cart() {
             </tbody>
           </Table>
         </div>
-        <Row className="border">
+        <Row className="shadow bg-body">
           <Stack
             direction="horizontal"
             className="align-items-center justify-content-around p-2"
@@ -240,11 +242,13 @@ function Cart() {
               <p className="m-0">
                 Total ({selectedProducts.length} item
                 {selectedProducts.length > 1 && "s"}):{" "}
-                <span className="text-primary fw-bold fs-4">
+                <span className="text-primary-emphasis fw-bold fs-4">
                   ${totalPrice.toFixed(2)}
                 </span>
               </p>
-              <Button onClick={handleCheckout}>Checkout</Button>
+              <Button variant="light" onClick={handleCheckout}>
+                Checkout
+              </Button>
             </Stack>
           </Stack>
           <CustomModal

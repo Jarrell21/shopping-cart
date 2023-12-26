@@ -1,7 +1,9 @@
 import { useEffect } from "react"
 import { useGetProductsQuery } from "../redux/api/apiSlice"
 import { Card, Col, Container, Row, Spinner, Stack } from "react-bootstrap"
+import { FaStar } from "react-icons/fa"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import styled from "styled-components"
 
 function Products() {
   const { categoryName } = useParams()
@@ -35,39 +37,54 @@ function Products() {
     )
   } else if (isSuccess) {
     content = (
-      <Row s={1} md={2} lg={3} xl={4} className="g-4">
+      <Row xs={1} sm={2} md={3} lg={4} className="g-4">
         {products?.map((product, index) => (
-          <Link
-            className="text-decoration-none"
-            to={`/products/${product.id}`}
-            key={index}
-          >
-            <Col>
-              <Card className="p-4">
-                <Card.Img
-                  variant="top"
-                  src={product.image}
-                  className="w-50 h-auto"
-                />
+          <Col key={index}>
+            <Link
+              className="text-decoration-none"
+              to={`/products/${product.id}`}
+            >
+              <StyledCard className="p-4 h-100 shadow">
+                <Stack className="align-items-center justify-content-center h-100">
+                  <Card.Img variant="top" src={product.image} />
+                </Stack>
                 <Card.Body>
-                  <Card.Title>{product.title.substring(0, 20)}...</Card.Title>
+                  <Card.Title>{product.title.substring(0, 17)}...</Card.Title>
                   <div>
-                    <p>${product.price}</p>
-                    <Stack direction="horizontal" className="gap-3">
-                      <p>{product.rating.rate} Stars</p>
-                      <p>{product.rating.count}+ Sold</p>
+                    <span className="fw-bold fs-4">${product.price}</span>
+                    <Stack
+                      direction="horizontal"
+                      className="gap-1 align-items-center justify-content-between"
+                    >
+                      <Stack
+                        direction="horizontal"
+                        className="gap-1 align-items-center"
+                      >
+                        <FaStar />
+                        <span>{product.rating.rate}</span>
+                      </Stack>
+                      <span>{product.rating.count} Sold</span>
                     </Stack>
                   </div>
                 </Card.Body>
-              </Card>
-            </Col>
-          </Link>
+              </StyledCard>
+            </Link>
+          </Col>
         ))}
       </Row>
     )
   }
 
-  return <Container className="border p-5 h-100">{content}</Container>
+  return <Container className="p-4 h-100">{content}</Container>
 }
 
 export default Products
+
+const StyledCard = styled(Card)`
+  &:hover {
+    background-color: rgba(
+      var(--bs-secondary-bg-rgb),
+      var(--bs-bg-opacity)
+    ) !important;
+  }
+`

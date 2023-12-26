@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Container, Figure, Spinner, Stack, Carousel } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import { useGetProductsQuery } from "../../redux/api/apiSlice"
+import { FaArrowRight } from "react-icons/fa6"
 
 function TopProducts() {
   const {
@@ -52,10 +53,15 @@ function TopProducts() {
             <Carousel.Caption
               style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", color: "white" }}
             >
-              <h3>{product.title}</h3>
+              <h4>{product.title}</h4>
               <p>
                 {product.description.substring(0, 50)}...{" "}
-                <Link to={`/products/${product.id}`}>See more</Link>
+                <Link
+                  className="link-body-emphasis"
+                  to={`/products/${product.id}`}
+                >
+                  See more
+                </Link>
               </p>
             </Carousel.Caption>
           </Carousel.Item>
@@ -67,10 +73,16 @@ function TopProducts() {
   }
 
   return (
-    <Container className="border py-2">
+    <Container className="shadow py-2 bg-white">
       <Stack direction="horizontal" className="justify-content-between">
-        <h3>Top Products</h3>
-        <Link to="/products">View all products</Link>
+        <h3 className="p-3 mb-0">Top Products</h3>
+        <Link
+          to="/products"
+          className="icon-link icon-link-hover link-body-emphasis"
+        >
+          View all products
+          <FaArrowRight className="bi" />
+        </Link>
       </Stack>
       <Carousel
         activeIndex={index}

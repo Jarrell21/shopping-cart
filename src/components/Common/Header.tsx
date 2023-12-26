@@ -11,7 +11,7 @@ function Header() {
   return (
     <Navbar expand="md" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand className="fs-3">
+        <Navbar.Brand className="fs-2">
           <Link to="/" className="text-decoration-none text-reset">
             Shopping Cart
           </Link>
@@ -20,7 +20,7 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Item className="d-flex justify-content-center align-items-center">
-              <Link to="/cart">
+              <Link to="/cart" className="link-body-emphasis">
                 <FaCartShopping size="20px" />
                 <StyledBadge bg="danger" pill>
                   {products.length}

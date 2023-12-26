@@ -10,6 +10,7 @@ import {
   Spinner,
   Stack,
 } from "react-bootstrap"
+import { FaStar } from "react-icons/fa"
 import ProductQuantityInput from "./ProductQuantityInput"
 import CustomToast from "../Common/CustomToast"
 import { CartProduct } from "../../redux/types"
@@ -40,6 +41,12 @@ function Product() {
     setShowToast(true)
   }
 
+  const capitalizeFirstLetterOfEachWord = (string: string) =>
+    string
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ")
+
   let content
 
   if (isError) {
@@ -57,21 +64,30 @@ function Product() {
   } else if (isSuccess) {
     content = (
       <>
-        <Row className="h-100 align-items-center justify-content-center border">
-          <Col className="border">
+        <Row
+          xs={1}
+          md={2}
+          className="h-100 align-items-center justify-content-evenly"
+        >
+          <Col className="bg-body p-5 shadow">
             <Stack className="align-items-center">
               <Image src={product?.image} fluid width={"300"} />
             </Stack>
           </Col>
-          <Col className="border d-flex flex-column gap-2 p-5">
+          <Col className="d-flex flex-column gap-2 p-5">
             <h1>{product?.title}</h1>
             <Stack direction="horizontal" className="gap-5">
-              <div>{product?.rating.rate}</div>
-              <div>{product?.rating.count}</div>
+              <Stack direction="horizontal" className="">
+                <FaStar />
+                <span>{product?.rating.rate}</span>
+              </Stack>
+              <div>{product?.rating.count} Sold</div>
             </Stack>
             <h2>${product?.price}</h2>
             <div>{product?.description}</div>
-            <div>{product?.category}</div>
+            <p>
+              Category: {capitalizeFirstLetterOfEachWord(product?.category)}
+            </p>
             <Stack
               direction="horizontal"
               className="gap-2 justify-content-center"
@@ -82,6 +98,8 @@ function Product() {
                 setQuantityValue={setProductQuantity}
               />
               <Button
+                className="fw-bold"
+                variant="secondary"
                 onClick={() =>
                   addToCart({
                     productId: product?.id,
@@ -100,7 +118,7 @@ function Product() {
     )
   }
 
-  return <Container className="h-100 border">{content}</Container>
+  return <Container className="h-100">{content}</Container>
 }
 
 export default Product
