@@ -1,6 +1,5 @@
 import { Badge, Container, Nav, Navbar } from "react-bootstrap"
 import { FaCartShopping } from "react-icons/fa6"
-import { IoPersonCircleSharp } from "react-icons/io5"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { useAppSelector } from "../../redux/hooks"
@@ -27,9 +26,6 @@ function Header() {
                 </StyledBadge>
               </Link>
             </Nav.Item>
-            <Nav.Link>
-              <IoPersonCircleSharp size="25px" />
-            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

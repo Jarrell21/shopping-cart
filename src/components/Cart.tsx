@@ -246,7 +246,7 @@ function Cart() {
                   ${totalPrice.toFixed(2)}
                 </span>
               </p>
-              <Button variant="light" onClick={handleCheckout}>
+              <Button variant="dark" onClick={handleCheckout}>
                 Checkout
               </Button>
             </Stack>
