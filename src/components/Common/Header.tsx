@@ -15,19 +15,16 @@ function Header() {
             Shopping Cart
           </Link>
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <Nav.Item className="d-flex justify-content-center align-items-center">
-              <Link to="/cart" className="link-body-emphasis">
-                <FaCartShopping size="20px" />
-                <StyledBadge bg="danger" pill>
-                  {products.length}
-                </StyledBadge>
-              </Link>
-            </Nav.Item>
-          </Nav>
-        </Navbar.Collapse>
+        <Nav>
+          <Nav.Item className="d-flex justify-content-center align-items-center">
+            <Link to="/cart" className="link-body-emphasis">
+              <FaCartShopping size="20px" />
+              <StyledBadge bg="danger" pill>
+                {products.length}
+              </StyledBadge>
+            </Link>
+          </Nav.Item>
+        </Nav>
       </Container>
     </Navbar>
   )

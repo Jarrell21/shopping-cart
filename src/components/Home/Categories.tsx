@@ -58,7 +58,7 @@ function Categories() {
 
   return (
     <>
-      <Container className="bg-white rounded-top shadow my-4">
+      <Container className="bg-white rounded-top shadow mb-4">
         <h3 className="p-3 mb-0">Categories</h3>
         <Row>{content}</Row>
       </Container>
