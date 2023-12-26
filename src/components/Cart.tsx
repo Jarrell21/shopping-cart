@@ -157,7 +157,7 @@ function Cart() {
             hover
             className="text-center shadow"
             style={{
-              minWidth: "600px",
+              minWidth: "700px",
             }}
           >
             <thead>
