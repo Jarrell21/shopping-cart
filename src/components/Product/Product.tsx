@@ -12,16 +12,17 @@ import {
 } from "react-bootstrap"
 import { FaStar } from "react-icons/fa"
 import ProductQuantityInput from "./ProductQuantityInput"
-import CustomToast from "../Common/CustomToast"
 import { CartProduct } from "../../redux/types"
 import { useAppDispatch } from "../../redux/hooks"
 import { addProductToCart } from "../../redux/cart/cartSlice"
+import { capitalizeFirstLetterOfEachWord } from "../../helpers/helpers"
+import CustomModal from "../Common/CustomModal"
 
 function Product() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [productQuantity, setProductQuantity] = useState(1)
-  const [showToast, setShowToast] = useState(false)
+  const [showAddedProductModal, setShowAddedProductModal] = useState(false)
   const { productId } = useParams()
   const {
     data: product,
@@ -38,14 +39,8 @@ function Product() {
 
   const addToCart = ({ productId, quantity, selected }: CartProduct) => {
     dispatch(addProductToCart({ productId, quantity, selected }))
-    setShowToast(true)
+    setShowAddedProductModal(true)
   }
-
-  const capitalizeFirstLetterOfEachWord = (string: string) =>
-    string
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")
 
   let content
 
@@ -112,7 +107,11 @@ function Product() {
               </Button>
             </Stack>
           </Col>
-          <CustomToast show={showToast} setShow={setShowToast} />
+          <CustomModal
+            show={showAddedProductModal}
+            onConfirm={() => setShowAddedProductModal(false)}
+            content="Product added to cart"
+          />
         </Row>
       </>
     )

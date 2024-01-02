@@ -1,12 +1,13 @@
 import { Badge, Container, Nav, Navbar } from "react-bootstrap"
 import { FaCartShopping } from "react-icons/fa6"
+import { TbTruckDelivery } from "react-icons/tb"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { useAppSelector } from "../../redux/hooks"
-import { selectProducts } from "../../redux/cart/cartSlice"
+import { selectCartProducts } from "../../redux/cart/cartSlice"
 
 function Header() {
-  const products = useAppSelector(selectProducts)
+  const products = useAppSelector(selectCartProducts)
   return (
     <Navbar expand="md" className="bg-body-tertiary">
       <Container>
@@ -15,14 +16,22 @@ function Header() {
             Shopping Cart
           </Link>
         </Navbar.Brand>
-        <Nav>
-          <Nav.Item className="d-flex justify-content-center align-items-center">
+        <Nav className="flex-row">
+          <Nav.Item>
             <Link to="/cart" className="link-body-emphasis">
               <FaCartShopping size="20px" />
               <StyledBadge bg="danger" pill>
                 {products.length}
               </StyledBadge>
             </Link>
+          </Nav.Item>
+          <Nav.Item>
+            <div>
+              <TbTruckDelivery size="25px" />
+              <StyledBadge bg="danger" pill>
+                {products.length}
+              </StyledBadge>
+            </div>
           </Nav.Item>
         </Nav>
       </Container>

@@ -14,8 +14,8 @@ const ErrorPage = () => {
       <Stack className="justify-content-center align-items-center">
         <h1>{errorMessage}</h1>
         <p>
-          You can go back to the home page by clicking
-          <Link to="/">here</Link>, though!
+          You can go back to the home page by clicking <Link to="/">here</Link>,
+          though!
         </p>
       </Stack>
       <Footer />

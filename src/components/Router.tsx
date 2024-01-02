@@ -22,10 +22,6 @@ function Router() {
           element: <Products />,
         },
         {
-          path: "products/category/:categoryName",
-          element: <Products />,
-        },
-        {
           path: "products/:productId",
           element: <Product />,
         },

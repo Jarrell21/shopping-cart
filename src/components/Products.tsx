@@ -1,25 +1,85 @@
-import { useEffect } from "react"
-import { useGetProductsQuery } from "../redux/api/apiSlice"
-import { Card, Col, Container, Row, Spinner, Stack } from "react-bootstrap"
+import { useEffect, useMemo, useState } from "react"
+import {
+  useGetCategoriesQuery,
+  useGetProductsQuery,
+} from "../redux/api/apiSlice"
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  Spinner,
+  Stack,
+} from "react-bootstrap"
 import { FaStar } from "react-icons/fa"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { FaCheck } from "react-icons/fa"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { CartProduct } from "../redux/types"
+import { useAppDispatch, useAppSelector } from "../redux/hooks"
+import { addProductToCart, selectCartProducts } from "../redux/cart/cartSlice"
+import { capitalizeFirstLetterOfEachWord } from "../helpers/helpers"
 
 function Products() {
-  const { categoryName } = useParams()
   const navigate = useNavigate()
-  const {
-    data: products = [],
+  const dispatch = useAppDispatch()
+  const location = useLocation()
+  const [categoryName, setCategoryName] = useState(
+    location.state?.categoryName ?? "",
+  )
+  const [sortBy, setSortBy] = useState("")
+  const { data: categories = [] } = useGetCategoriesQuery()
+  const cartProducts = useAppSelector(selectCartProducts)
+  let {
+    data: productsData = [],
     isLoading,
     isSuccess,
     isError,
-  } = useGetProductsQuery({ category: categoryName })
+  } = useGetProductsQuery({})
+  let productsWithAddedProp = useMemo(() => {
+    return productsData
+      .map((item) => {
+        let cartProduct = cartProducts.find(
+          (product) => product.productId === item.id,
+        )
+        if (cartProduct) {
+          return { ...item, added: true }
+        }
+
+        return { ...item, added: false }
+      })
+      .filter(Boolean)
+  }, [productsData, cartProducts])
+
+  let filteredData = useMemo(() => {
+    if (categoryName) {
+      return productsWithAddedProp.filter(
+        (product) => product.category === categoryName,
+      )
+    }
+    return productsWithAddedProp
+  }, [categoryName, productsWithAddedProp])
+
+  let sortedData = useMemo(() => {
+    if (sortBy === "LOWEST") {
+      return [...filteredData].sort((a, b) => a.price - b.price)
+    } else if (sortBy === "HIGHEST") {
+      return [...filteredData].sort((a, b) => b.price - a.price)
+    }
+    return filteredData
+  }, [sortBy, filteredData])
 
   useEffect(() => {
-    if (isSuccess && !products.length) {
+    if (isSuccess && !productsWithAddedProp?.length) {
       navigate("/error")
     }
-  }, [isSuccess, navigate, products])
+  }, [isSuccess, navigate, productsWithAddedProp])
+
+  const addToCart = ({ productId, quantity, selected }: CartProduct) => {
+    dispatch(addProductToCart({ productId, quantity, selected }))
+  }
 
   let content
 
@@ -37,16 +97,49 @@ function Products() {
     )
   } else if (isSuccess) {
     content = (
-      <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-        {products?.map((product, index) => (
-          <Col key={index}>
-            <Link
-              className="text-decoration-none"
-              to={`/products/${product.id}`}
-            >
+      <>
+        <Row className="p-2">
+          <Form.Select
+            style={{ flex: 1 }}
+            aria-label="Default select example"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+          >
+            <option value="" disabled>
+              Filter by
+            </option>
+            <option value="">Remove filter</option>
+            {categories.map((category, index) => (
+              <option value={category} key={index}>
+                {capitalizeFirstLetterOfEachWord(category)}
+              </option>
+            ))}
+          </Form.Select>
+          <Form.Select
+            style={{ flex: 1 }}
+            aria-label="Default select example"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="" disabled>
+              Sort by
+            </option>
+            <option value="">Remove sort</option>
+            <option value="LOWEST">Lowest price first</option>
+            <option value="HIGHEST">Highest price first</option>
+          </Form.Select>
+        </Row>
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+          {sortedData.map((product, index) => (
+            <Col key={index}>
               <StyledCard className="p-4 h-100 shadow">
                 <Stack className="align-items-center justify-content-center h-100">
-                  <Card.Img variant="top" src={product.image} />
+                  <Link
+                    className="text-decoration-none"
+                    to={`/products/${product.id}`}
+                  >
+                    <Card.Img variant="top" src={product.image} />
+                  </Link>
                 </Stack>
                 <Card.Body>
                   <Card.Title>{product.title.substring(0, 17)}...</Card.Title>
@@ -65,13 +158,32 @@ function Products() {
                       </Stack>
                       <span>{product.rating.count} Sold</span>
                     </Stack>
+                    {product.added ? (
+                      <Button className="fw-bold w-100 mt-2" variant="success">
+                        Added <FaCheck />
+                      </Button>
+                    ) : (
+                      <Button
+                        className="fw-bold w-100 mt-2"
+                        variant="primary"
+                        onClick={() =>
+                          addToCart({
+                            productId: product?.id,
+                            quantity: 1,
+                            selected: false,
+                          })
+                        }
+                      >
+                        Add to Cart
+                      </Button>
+                    )}
                   </div>
                 </Card.Body>
               </StyledCard>
-            </Link>
-          </Col>
-        ))}
-      </Row>
+            </Col>
+          ))}
+        </Row>
+      </>
     )
   }
 
@@ -82,9 +194,7 @@ export default Products
 
 const StyledCard = styled(Card)`
   &:hover {
-    background-color: rgba(
-      var(--bs-secondary-bg-rgb),
-      var(--bs-bg-opacity)
-    ) !important;
+    transform: scale(1.05);
+    transition: 50ms ease-in;
   }
 `

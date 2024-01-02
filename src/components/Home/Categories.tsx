@@ -43,7 +43,8 @@ function Categories() {
       return (
         <StyledCol md className="p-0 shadow-sm" key={index}>
           <Link
-            to={`/products/category/${category}`}
+            to="/products"
+            state={{ categoryName: category }}
             className="text-decoration-none text-reset"
           >
             <Stack className="flexbox">

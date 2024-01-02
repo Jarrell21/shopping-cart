@@ -1,3 +1,14 @@
+import { useEffect, useMemo, useState } from "react"
+import { Link } from "react-router-dom"
+import { useGetProductsQuery } from "../redux/api/apiSlice"
+import { useAppDispatch, useAppSelector } from "../redux/hooks"
+import {
+  deleteProductById,
+  deleteProducts,
+  selectCartProducts,
+  setProductSelectedById,
+  setProductsSelected,
+} from "../redux/cart/cartSlice"
 import {
   Button,
   Container,
@@ -7,64 +18,72 @@ import {
   Stack,
   Table,
 } from "react-bootstrap"
-import { useGetProductsQuery } from "../redux/api/apiSlice"
-import { useAppDispatch, useAppSelector } from "../redux/hooks"
-import {
-  deleteProductById,
-  selectProducts,
-  updateProduct,
-} from "../redux/cart/cartSlice"
 import ProductQuantityInput from "./Product/ProductQuantityInput"
-import { useEffect, useState } from "react"
 import CustomModal from "./Common/CustomModal"
-import { Link } from "react-router-dom"
 
 function Cart() {
-  const cartProductsData = useAppSelector(selectProducts)
-  const dispatch = useAppDispatch()
-  const [isSelectAll, setIsSelectAll] = useState(false)
-  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false)
-  const [showNoProductSelectedModal, setShowNoProductSelectedModal] =
-    useState(false)
-
-  const [showCheckoutModal, setShowCheckoutModal] = useState(false)
   const {
     data: productsData = [],
     isLoading,
     isSuccess,
     isError,
   } = useGetProductsQuery({})
+  const cartProducts = useAppSelector(selectCartProducts)
+  const dispatch = useAppDispatch()
+  const [isSelectAll, setIsSelectAll] = useState(false)
+  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false)
+  const [showDeleteSelectedProductsModal, setShowDeleteSelectedProductsModal] =
+    useState(false)
+  const [showNoProductSelectedModal, setShowNoProductSelectedModal] =
+    useState(false)
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false)
 
-  const cartProducts = cartProductsData
-    .map((item) => {
-      let product = productsData?.find(
-        (product) => product.id === item.productId,
-      )
-      if (product) {
-        return { ...product, quantity: item.quantity, selected: item.selected }
-      }
+  let combinedProducts = useMemo(() => {
+    return cartProducts
+      .map((item) => {
+        let product = productsData.find(
+          (product) => product.id === item.productId,
+        )
+        if (product) {
+          return {
+            ...product,
+            quantity: item.quantity,
+            selected: item.selected,
+          }
+        }
 
-      return null
-    })
-    .filter(Boolean)
+        return null
+      })
+      .filter(Boolean)
+  }, [cartProducts, productsData])
 
-  const selectedProducts = cartProducts.filter(
-    (product) => product?.selected === true,
-  )
+  const selectedProducts = useMemo(() => {
+    return combinedProducts.filter((product) => product!.selected === true)
+  }, [combinedProducts])
 
-  const totalPrice = cartProducts.reduce(
-    (total, product) =>
-      product?.selected ? total + product.price * product.quantity : total,
-    0,
+  // const totalPrice = combinedProducts.reduce(
+  //   (total, product) =>
+  //     product?.selected ? total + product.price * product.quantity : total,
+  //   0,
+  // )
+
+  const totalPrice = useMemo(
+    () =>
+      selectedProducts.reduce(
+        (total, product) =>
+          product?.selected ? total + product.price * product.quantity : total,
+        0,
+      ),
+    [selectedProducts],
   )
 
   useEffect(() => {
-    if (cartProducts.length < 1) {
+    if (combinedProducts.length < 1) {
       setIsSelectAll(false)
       return
     }
 
-    let hasUnselected = cartProducts.some(
+    let hasUnselected = combinedProducts.some(
       (product) => product!.selected === false,
     )
 
@@ -73,36 +92,31 @@ function Cart() {
     } else {
       setIsSelectAll(true)
     }
-  }, [cartProducts])
+  }, [combinedProducts])
 
   const handleSelectAll = () => {
     if (isSelectAll) {
       setIsSelectAll(false)
-
-      cartProducts.forEach((product) => {
-        dispatch(updateProduct({ productId: product!.id, selected: false }))
-      })
-    } else if (!isSelectAll && cartProducts.length > 0) {
-      // select all here
+      dispatch(setProductsSelected({ selected: false }))
+    } else if (!isSelectAll && combinedProducts.length > 0) {
       setIsSelectAll(true)
-
-      cartProducts.forEach((product) => {
-        dispatch(updateProduct({ productId: product!.id, selected: true }))
-      })
+      dispatch(setProductsSelected({ selected: true }))
     }
   }
 
   const handleSelect = (productId: number, selected: boolean) => {
     if (selected) {
-      dispatch(updateProduct({ productId: productId, selected: false }))
+      dispatch(
+        setProductSelectedById({ productId: productId, selected: false }),
+      )
     } else {
-      dispatch(updateProduct({ productId: productId, selected: true }))
+      dispatch(setProductSelectedById({ productId: productId, selected: true }))
     }
   }
 
   const handleDeleteSelectedProducts = () => {
     if (selectedProducts.length) {
-      setShowDeleteProductModal(true)
+      setShowDeleteSelectedProductsModal(true)
     } else {
       setShowNoProductSelectedModal(true)
     }
@@ -110,14 +124,13 @@ function Cart() {
 
   const deleteProduct = (id: number) => {
     dispatch(deleteProductById(id))
+    setShowDeleteProductModal(false)
   }
 
   const deleteSelectedProducts = () => {
-    selectedProducts.forEach((product) => {
-      dispatch(deleteProductById(product!.id))
-    })
+    dispatch(deleteProducts(selectedProducts))
 
-    setShowDeleteProductModal(false)
+    setShowDeleteSelectedProductsModal(false)
   }
 
   const handleCheckout = () => {
@@ -133,7 +146,9 @@ function Cart() {
   if (isError) {
     content = (
       <Stack className="justify-content-center align-items-center h-100">
-        Failed to load products. A network error has occured.
+        <p className="fw-bold">
+          Failed to load products. A network error has occured.
+        </p>
       </Stack>
     )
   } else if (isLoading) {
@@ -142,10 +157,12 @@ function Cart() {
         <Spinner animation="border" />
       </Stack>
     )
-  } else if (cartProducts.length < 1) {
+  } else if (combinedProducts.length < 1) {
     content = (
       <Stack className="justify-content-center align-items-center h-100">
-        Your cart is empty at the moment
+        <p className="fw-bold">
+          Your cart is empty! Products added to cart will show here
+        </p>
       </Stack>
     )
   } else if (isSuccess) {
@@ -177,7 +194,7 @@ function Cart() {
               </tr>
             </thead>
             <tbody className="table-group-divider">
-              {cartProducts?.map((product, index) => (
+              {combinedProducts?.map((product, index) => (
                 <tr key={index}>
                   <td className="align-middle">
                     <Form.Check
@@ -212,11 +229,19 @@ function Cart() {
                   <td className="align-middle">
                     <Button
                       variant="danger"
-                      onClick={() => deleteProduct(product!.id)}
+                      onClick={() => setShowDeleteProductModal(true)}
                     >
                       Delete
                     </Button>
                   </td>
+                  <CustomModal
+                    show={showDeleteProductModal}
+                    onConfirm={() => deleteProduct(product!.id)}
+                    onCancel={() => setShowDeleteProductModal(false)}
+                    content={`Do you want to delete (${
+                      product!.title
+                    }) from the cart?`}
+                  />
                 </tr>
               ))}
             </tbody>
@@ -233,7 +258,7 @@ function Cart() {
                 checked={isSelectAll}
                 onChange={handleSelectAll}
               />
-              <p className="m-0">Select All ({cartProducts.length})</p>
+              <p className="m-0">Select All ({combinedProducts.length})</p>
               <Button variant="danger" onClick={handleDeleteSelectedProducts}>
                 Delete
               </Button>
@@ -252,9 +277,9 @@ function Cart() {
             </Stack>
           </Stack>
           <CustomModal
-            show={showDeleteProductModal}
+            show={showDeleteSelectedProductsModal}
             onConfirm={() => deleteSelectedProducts()}
-            onCancel={() => setShowDeleteProductModal(false)}
+            onCancel={() => setShowDeleteSelectedProductsModal(false)}
             content={`Do you want to delete the (${
               selectedProducts.length
             }) selected product${

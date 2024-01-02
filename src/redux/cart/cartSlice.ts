@@ -28,39 +28,84 @@ export const cartSlice = createSlice({
     addProduct: (state, action: PayloadAction<CartProduct>) => {
       state.products.push(action.payload)
     },
-    updateProduct: (
+    incrementProductQuantity: (
       state,
-      action: PayloadAction<{
-        productId: number
-        quantity?: number
-        selected?: boolean
-        verb?: "INCREMENT" | "DECREMENT"
-      }>,
+      action: PayloadAction<{ productId: number }>,
     ) => {
-      const { productId, quantity, selected, verb } = action.payload
+      const { productId } = action.payload
+
       const existingProduct = state.products.find(
         (product) => product.productId === productId,
       )
 
       if (existingProduct) {
-        if (selected !== undefined) {
-          existingProduct.selected = selected!
-        }
+        existingProduct.quantity += 1
+      }
+    },
+    decrementProductQuantity: (
+      state,
+      action: PayloadAction<{ productId: number }>,
+    ) => {
+      const { productId } = action.payload
 
-        if (verb === "INCREMENT") {
-          if (quantity) {
-            existingProduct.quantity += quantity!
-          } else {
-            existingProduct.quantity += 1
-          }
-        } else if (verb === "DECREMENT") {
+      const existingProduct = state.products.find(
+        (product) => product.productId === productId,
+      )
+
+      if (existingProduct) {
+        if (existingProduct.quantity > 0) {
           existingProduct.quantity -= 1
         }
-
-        if (quantity) {
-          existingProduct.quantity = quantity!
-        }
       }
+    },
+    incrementProductQuantityByAmount: (
+      state,
+      action: PayloadAction<{ productId: number; quantity: number }>,
+    ) => {
+      const { productId, quantity } = action.payload
+
+      const existingProduct = state.products.find(
+        (product) => product.productId === productId,
+      )
+
+      if (existingProduct) {
+        existingProduct.quantity += quantity
+      }
+    },
+    setProductQuantity: (
+      state,
+      action: PayloadAction<{ productId: number; quantity: number }>,
+    ) => {
+      const { productId, quantity } = action.payload
+      const existingProduct = state.products.find(
+        (product) => product.productId === productId,
+      )
+
+      if (existingProduct) {
+        existingProduct.quantity = quantity
+      }
+    },
+    setProductSelectedById: (
+      state,
+      action: PayloadAction<{ productId: number; selected: boolean }>,
+    ) => {
+      const { productId, selected } = action.payload
+      const existingProduct = state.products.find(
+        (product) => product.productId === productId,
+      )
+
+      if (existingProduct) {
+        existingProduct.selected = selected
+      }
+    },
+    setProductsSelected: (
+      state,
+      action: PayloadAction<{ selected: boolean }>,
+    ) => {
+      const { selected } = action.payload
+      state.products.forEach((product) => {
+        product.selected = selected
+      })
     },
     deleteProductById: (state, action: PayloadAction<number>) => {
       const productId = action.payload
@@ -69,32 +114,44 @@ export const cartSlice = createSlice({
       )
       state.products = updatedProducts
     },
+    deleteProducts: (state, action: PayloadAction<any[]>) => {
+      const products = action.payload
+      const productIds = products.map((product) => product.id)
+      const updatedProducts = state.products.filter(
+        (product) => !productIds.includes(product.productId),
+      )
+      state.products = updatedProducts
+    },
   },
 })
 
-export const { addProduct, updateProduct, deleteProductById } =
-  cartSlice.actions
+export const {
+  addProduct,
+  incrementProductQuantity,
+  decrementProductQuantity,
+  incrementProductQuantityByAmount,
+  setProductQuantity,
+  setProductSelectedById,
+  setProductsSelected,
+  deleteProductById,
+  deleteProducts,
+} = cartSlice.actions
 
-export const selectProducts = (state: RootState) => state.cart.products
-
-export const selectProductById = (state: RootState, productId: number) => {
-  state.cart.products.find((product) => product.productId === productId)
-}
+export const selectCartProducts = (state: RootState) => state.cart.products
 
 export const addProductToCart =
   (cartProduct: CartProduct): AppThunk =>
   (dispatch, getState) => {
-    const currentProducts = selectProducts(getState())
+    const currentProducts = selectCartProducts(getState())
     let existingProduct = currentProducts.find(
       (product) => product.productId === cartProduct.productId,
     )
 
     if (existingProduct) {
       dispatch(
-        updateProduct({
-          productId: cartProduct.productId,
+        incrementProductQuantityByAmount({
+          productId: existingProduct.productId,
           quantity: cartProduct.quantity,
-          verb: "INCREMENT",
         }),
       )
     } else {

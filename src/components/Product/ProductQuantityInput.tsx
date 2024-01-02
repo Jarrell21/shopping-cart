@@ -2,7 +2,11 @@ import React from "react"
 import { Button, Form, InputGroup } from "react-bootstrap"
 import styled from "styled-components"
 import { useAppDispatch } from "../../redux/hooks"
-import { updateProduct } from "../../redux/cart/cartSlice"
+import {
+  decrementProductQuantity,
+  incrementProductQuantity,
+  setProductQuantity,
+} from "../../redux/cart/cartSlice"
 
 type ProductQuantityProps = {
   className?: string
@@ -33,7 +37,7 @@ function ProductQuantityInput({
 
     if (productId) {
       dispatch(
-        updateProduct({
+        setProductQuantity({
           productId: productId,
           quantity: inputValue,
         }),
@@ -48,9 +52,8 @@ function ProductQuantityInput({
     if (quantityValue < max) {
       if (productId) {
         dispatch(
-          updateProduct({
+          incrementProductQuantity({
             productId: productId,
-            verb: "INCREMENT",
           }),
         )
         return
@@ -63,9 +66,8 @@ function ProductQuantityInput({
     if (quantityValue > 1) {
       if (productId) {
         dispatch(
-          updateProduct({
+          decrementProductQuantity({
             productId: productId,
-            verb: "DECREMENT",
           }),
         )
         return
