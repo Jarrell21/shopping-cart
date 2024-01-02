@@ -61,12 +61,6 @@ function Cart() {
     return combinedProducts.filter((product) => product!.selected === true)
   }, [combinedProducts])
 
-  // const totalPrice = combinedProducts.reduce(
-  //   (total, product) =>
-  //     product?.selected ? total + product.price * product.quantity : total,
-  //   0,
-  // )
-
   const totalPrice = useMemo(
     () =>
       selectedProducts.reduce(
