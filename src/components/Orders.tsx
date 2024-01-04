@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { useAppSelector } from "../redux/hooks"
 import { useGetProductsQuery } from "../redux/api/apiSlice"
 import { Container, Row, Spinner, Stack, Table } from "react-bootstrap"
@@ -96,7 +96,7 @@ function Orders() {
                   <td className="align-middle">
                     ${(product!.quantity * product!.price).toFixed(2)}
                   </td>
-                  <td className="align-middle">On the way</td>
+                  <td className="align-middle">{product?.status}</td>
                 </tr>
               ))}
             </tbody>

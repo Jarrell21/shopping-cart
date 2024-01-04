@@ -8,6 +8,7 @@ const initialState: Order[] = [
     quantity: 3,
     selected: false,
     orderNumber: "#a2b1de67",
+    status: "Completed",
   },
 ]
 
@@ -18,10 +19,26 @@ const orderSlice = createSlice({
     addOrder: (state, action: PayloadAction<Order>) => {
       state.push(action.payload)
     },
+    updateOrderStatus: (
+      state,
+      action: PayloadAction<{
+        orderNumber: string
+        status: "To Ship" | "To Receive" | "Completed"
+      }>,
+    ) => {
+      const { orderNumber, status } = action.payload
+      const existingOrder = state.find(
+        (order) => order.orderNumber === orderNumber,
+      )
+
+      if (existingOrder) {
+        existingOrder.status = status
+      }
+    },
   },
 })
 
-export const { addOrder } = orderSlice.actions
+export const { addOrder, updateOrderStatus } = orderSlice.actions
 
 export const selectOrders = (state: RootState) => state.orders
 

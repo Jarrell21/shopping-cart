@@ -31,4 +31,5 @@ export type Order = {
   productId: number
   quantity: number
   selected: boolean
+  status: "To Ship" | "To Receive" | "Completed"
 }

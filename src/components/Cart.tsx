@@ -22,6 +22,7 @@ import ProductQuantityInput from "./Product/ProductQuantityInput"
 import CustomModal from "./Common/CustomModal"
 import { v4 as uuidv4 } from "uuid"
 import { addOrder } from "../redux/orders/orderSlice"
+import { Order } from "../redux/types"
 
 function Cart() {
   const {
@@ -141,12 +142,12 @@ function Cart() {
   const handleCheckout = () => {
     cartProducts.forEach((product) => {
       if (product.selected) {
-        dispatch(
-          addOrder({
-            ...product,
-            orderNumber: `#${uuidv4().substring(0, 8)}`,
-          }),
-        )
+        const newOder: Order = {
+          ...product,
+          orderNumber: `#${uuidv4().substring(0, 8)}`,
+          status: "To Ship",
+        }
+        dispatch(addOrder(newOder))
         dispatch(deleteProductById(product.productId))
       }
     })
@@ -314,7 +315,7 @@ function Cart() {
             content={
               <>
                 Your total is:
-                <h2 className="fw-bold">${totalPrice.toFixed(2)}</h2>
+                <p className="fw-bold fs-2 m-0">${totalPrice.toFixed(2)}</p>
                 Proceed?
               </>
             }
