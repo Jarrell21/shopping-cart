@@ -108,7 +108,7 @@ function Products() {
             <option value="" disabled>
               Filter by
             </option>
-            <option value="">Remove filter</option>
+            {categoryName !== "" && <option value="">Remove filter</option>}
             {categories.map((category, index) => (
               <option value={category} key={index}>
                 {capitalizeFirstLetterOfEachWord(category)}
@@ -124,7 +124,7 @@ function Products() {
             <option value="" disabled>
               Sort by
             </option>
-            <option value="">Remove sort</option>
+            {sortBy !== "" && <option value="">Remove sort</option>}
             <option value="LOWEST">Lowest price first</option>
             <option value="HIGHEST">Highest price first</option>
           </Form.Select>

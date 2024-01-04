@@ -1,10 +1,11 @@
+import { ReactNode } from "react"
 import { Button, Modal } from "react-bootstrap"
 
 type CustomModalProps = {
   show: boolean
   onConfirm: () => void
   onCancel?: () => void
-  content: string
+  content: string | ReactNode
 }
 
 function CustomModal({ show, onConfirm, onCancel, content }: CustomModalProps) {

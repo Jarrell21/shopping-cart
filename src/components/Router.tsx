@@ -5,6 +5,7 @@ import Products from "./Products"
 import Home from "./Home/Home"
 import Product from "./Product/Product"
 import Cart from "./Cart"
+import Orders from "./Orders"
 
 function Router() {
   const router = createBrowserRouter([
@@ -24,6 +25,10 @@ function Router() {
         {
           path: "products/:productId",
           element: <Product />,
+        },
+        {
+          path: "orders",
+          element: <Orders />,
         },
       ],
       errorElement: <ErrorPage />,

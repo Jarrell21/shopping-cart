@@ -25,3 +25,10 @@ export type CartData = {
   products: CartProduct[]
   __v: number
 }
+
+export type Order = {
+  orderNumber: string
+  productId: number
+  quantity: number
+  selected: boolean
+}

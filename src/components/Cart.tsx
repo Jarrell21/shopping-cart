@@ -20,6 +20,8 @@ import {
 } from "react-bootstrap"
 import ProductQuantityInput from "./Product/ProductQuantityInput"
 import CustomModal from "./Common/CustomModal"
+import { v4 as uuidv4 } from "uuid"
+import { addOrder } from "../redux/orders/orderSlice"
 
 function Cart() {
   const {
@@ -30,8 +32,10 @@ function Cart() {
   } = useGetProductsQuery({})
   const cartProducts = useAppSelector(selectCartProducts)
   const dispatch = useAppDispatch()
-  const [isSelectAll, setIsSelectAll] = useState(false)
-  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false)
+  const [isAllProductsSelected, setIsAllProductsSelected] = useState(false)
+  const [productIdToBeDeleted, setProductIdToBeDeleted] = useState<
+    number | null
+  >(null)
   const [showDeleteSelectedProductsModal, setShowDeleteSelectedProductsModal] =
     useState(false)
   const [showNoProductSelectedModal, setShowNoProductSelectedModal] =
@@ -47,8 +51,7 @@ function Cart() {
         if (product) {
           return {
             ...product,
-            quantity: item.quantity,
-            selected: item.selected,
+            ...item,
           }
         }
 
@@ -73,7 +76,7 @@ function Cart() {
 
   useEffect(() => {
     if (combinedProducts.length < 1) {
-      setIsSelectAll(false)
+      setIsAllProductsSelected(false)
       return
     }
 
@@ -82,23 +85,23 @@ function Cart() {
     )
 
     if (hasUnselected) {
-      setIsSelectAll(false)
+      setIsAllProductsSelected(false)
     } else {
-      setIsSelectAll(true)
+      setIsAllProductsSelected(true)
     }
   }, [combinedProducts])
 
-  const handleSelectAll = () => {
-    if (isSelectAll) {
-      setIsSelectAll(false)
+  const handleSelectAllProducts = () => {
+    if (isAllProductsSelected) {
+      setIsAllProductsSelected(false)
       dispatch(setProductsSelected({ selected: false }))
-    } else if (!isSelectAll && combinedProducts.length > 0) {
-      setIsSelectAll(true)
+    } else if (!isAllProductsSelected && combinedProducts.length > 0) {
+      setIsAllProductsSelected(true)
       dispatch(setProductsSelected({ selected: true }))
     }
   }
 
-  const handleSelect = (productId: number, selected: boolean) => {
+  const handleSelectProduct = (productId: number, selected: boolean) => {
     if (selected) {
       dispatch(
         setProductSelectedById({ productId: productId, selected: false }),
@@ -108,7 +111,7 @@ function Cart() {
     }
   }
 
-  const handleDeleteSelectedProducts = () => {
+  const handleDeleteSelectedButton = () => {
     if (selectedProducts.length) {
       setShowDeleteSelectedProductsModal(true)
     } else {
@@ -116,23 +119,38 @@ function Cart() {
     }
   }
 
-  const deleteProduct = (id: number) => {
+  const handleDeleteProduct = (id: number) => {
     dispatch(deleteProductById(id))
-    setShowDeleteProductModal(false)
+    setProductIdToBeDeleted(null)
   }
 
-  const deleteSelectedProducts = () => {
+  const handleDeleteSelectedProducts = () => {
     dispatch(deleteProducts(selectedProducts))
 
     setShowDeleteSelectedProductsModal(false)
   }
 
-  const handleCheckout = () => {
+  const handleCheckoutButton = () => {
     if (selectedProducts.length) {
       setShowCheckoutModal(true)
     } else {
       setShowNoProductSelectedModal(true)
     }
+  }
+
+  const handleCheckout = () => {
+    cartProducts.forEach((product) => {
+      if (product.selected) {
+        dispatch(
+          addOrder({
+            ...product,
+            orderNumber: `#${uuidv4().substring(0, 8)}`,
+          }),
+        )
+        dispatch(deleteProductById(product.productId))
+      }
+    })
+    setShowCheckoutModal(false)
   }
 
   let content
@@ -175,9 +193,8 @@ function Cart() {
               <tr>
                 <th className="align-middle p-3">
                   <Form.Check
-                    aria-label="option 1"
-                    checked={isSelectAll}
-                    onChange={handleSelectAll}
+                    checked={isAllProductsSelected}
+                    onChange={handleSelectAllProducts}
                   />
                 </th>
                 <th className="align-middle">Product</th>
@@ -188,14 +205,13 @@ function Cart() {
               </tr>
             </thead>
             <tbody className="table-group-divider">
-              {combinedProducts?.map((product, index) => (
+              {combinedProducts.map((product, index) => (
                 <tr key={index}>
                   <td className="align-middle">
                     <Form.Check
-                      aria-label="option 1"
                       checked={product?.selected}
                       onChange={() =>
-                        handleSelect(product!.id, product!.selected)
+                        handleSelectProduct(product!.id, product!.selected)
                       }
                     />
                   </td>
@@ -218,23 +234,27 @@ function Cart() {
                     />
                   </td>
                   <td className="align-middle">
-                    ${product!.quantity * product!.price}
+                    ${(product!.quantity * product!.price).toFixed(2)}
                   </td>
                   <td className="align-middle">
                     <Button
                       variant="danger"
-                      onClick={() => setShowDeleteProductModal(true)}
+                      onClick={() => setProductIdToBeDeleted(product!.id)}
                     >
                       Delete
                     </Button>
                   </td>
                   <CustomModal
-                    show={showDeleteProductModal}
-                    onConfirm={() => deleteProduct(product!.id)}
-                    onCancel={() => setShowDeleteProductModal(false)}
-                    content={`Do you want to delete (${
-                      product!.title
-                    }) from the cart?`}
+                    show={productIdToBeDeleted === product!.id}
+                    onConfirm={() => handleDeleteProduct(product!.id)}
+                    onCancel={() => setProductIdToBeDeleted(null)}
+                    content={
+                      <>
+                        Do you want to delete{" "}
+                        <span className="fw-bold">({product!.title})</span> from
+                        the cart?
+                      </>
+                    }
                   />
                 </tr>
               ))}
@@ -248,12 +268,11 @@ function Cart() {
           >
             <Stack direction="horizontal" className="align-items-center gap-2">
               <Form.Check
-                aria-label="option 1"
-                checked={isSelectAll}
-                onChange={handleSelectAll}
+                checked={isAllProductsSelected}
+                onChange={handleSelectAllProducts}
               />
-              <p className="m-0">Select All ({combinedProducts.length})</p>
-              <Button variant="danger" onClick={handleDeleteSelectedProducts}>
+              <span>Select All ({combinedProducts.length})</span>
+              <Button variant="danger" onClick={handleDeleteSelectedButton}>
                 Delete
               </Button>
             </Stack>
@@ -265,20 +284,23 @@ function Cart() {
                   ${totalPrice.toFixed(2)}
                 </span>
               </p>
-              <Button variant="dark" onClick={handleCheckout}>
+              <Button variant="dark" onClick={handleCheckoutButton}>
                 Checkout
               </Button>
             </Stack>
           </Stack>
           <CustomModal
             show={showDeleteSelectedProductsModal}
-            onConfirm={() => deleteSelectedProducts()}
+            onConfirm={() => handleDeleteSelectedProducts()}
             onCancel={() => setShowDeleteSelectedProductsModal(false)}
-            content={`Do you want to delete the (${
-              selectedProducts.length
-            }) selected product${
-              selectedProducts.length > 1 ? "s" : ""
-            } from the cart?`}
+            content={
+              <>
+                Do you want to delete the{" "}
+                <span className="fw-bold">({selectedProducts.length})</span>{" "}
+                selected product{selectedProducts.length > 1 && "s"} from the
+                cart?
+              </>
+            }
           />
           <CustomModal
             show={showNoProductSelectedModal}
@@ -287,8 +309,15 @@ function Cart() {
           />
           <CustomModal
             show={showCheckoutModal}
-            onConfirm={() => setShowCheckoutModal(false)}
-            content="Checkout is not yet implemented on this app ;)"
+            onConfirm={handleCheckout}
+            onCancel={() => setShowCheckoutModal(false)}
+            content={
+              <>
+                Your total is:
+                <h2 className="fw-bold">${totalPrice.toFixed(2)}</h2>
+                Proceed?
+              </>
+            }
           />
         </Row>
       </Stack>
